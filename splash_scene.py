@@ -1,4 +1,4 @@
-# Created by: Mr. Coxall
+# Created by: james
 # Created on: Sep 2016
 # Created for: ICS3U
 # This scene shows a splash screen for 2 seconds,
@@ -8,7 +8,7 @@ from scene import *
 import ui
 import time
 
-from main_menu_scene import *
+from logo_scene import *
 
 
 class SplashScene(Scene):
@@ -23,17 +23,17 @@ class SplashScene(Scene):
                                      color = (0.61, 0.78, 0.87), 
                                      parent = self, 
                                      size = self.size)
-        self.school_crest = SpriteNode('./assets/sprites/MT_Game_Studio.png',
+        #school crest in middle of screen
+        self.school_crest = SpriteNode('./assets/sprites/MT_Crest.jpg',
                                        parent = self,
-                                       position = self.size/2,
-                                       scale = 0.65)
+                                       position = self.size/2)
     
     def update(self):
         # this method is called, hopefully, 60 times a second
         
-        # after 2 seconds, move to main menu scene
+        # after 2 seconds, move to logo scene
         if not self.presented_scene and time.time() - self.start_time > 2:
-            self.present_modal_scene(MainMenuScene())
+            self.present_modal_scene(LogoScene())
     
     def touch_began(self, touch):
         # this method is called, when user touches the screen
@@ -61,4 +61,3 @@ class SplashScene(Scene):
         # this method is called, when user place app from background 
         # back into use. Reload anything you might need.
         pass
-    
