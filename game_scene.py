@@ -94,7 +94,7 @@ class GameScene(Scene):
         self.top_scores_file = open('./highscore.txt' , 'r+')
         self.the_highscore = json.load(self.top_scores_file)
         self.highscore = max(self.the_highscore)
-        
+        self.highscore_written_yet = False
         self.the_selected = 0
         self.play_sound = True
         self.score = 0
@@ -647,16 +647,18 @@ class GameScene(Scene):
         #if moves is zero, gameover happens and the main menu button appears
         if self.moves == 0:
             self.game_over = True
-            self.the_highscore.append(self.score)
-            self.highscore = max(self.the_highscore)
-            self.top_scores_file.seek(0)
-            json.dump(self.the_highscore, self.top_scores_file)
-            self.top_scores_file.close()
-            print(self.highscore)
             self.menu_button = SpriteNode('./assets/sprites/menu_button.png',
                                       parent = self,
                                       position = self.menu_button_position,
                                       alpha = 1.0)
+            if self.highscore_written_yet == False:
+                self.the_highscore.append(self.score)
+                self.highscore = max(self.the_highscore)
+                self.top_scores_file.seek(0)
+                json.dump(self.the_highscore, self.top_scores_file)
+                self.top_scores_file.close()
+                print(self.highscore)
+            
         
         
     
