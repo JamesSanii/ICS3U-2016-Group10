@@ -10,7 +10,7 @@ import ui
 import random
 import time
 import sound
-
+import json
 class GameScene(Scene):
 	
 	
@@ -91,12 +91,29 @@ class GameScene(Scene):
             self.chart.append(random.randint(1, 6))
         
         #variables
+        self.top_scores_file = open('./highscore.txt' , 'r+')
+        self.the_highscore = json.load(self.top_scores_file)
+        self.highscore = max(self.the_highscore)
+        
         self.the_selected = 0
-        self.play_sound=False
+        self.play_sound = True
         self.score = 0
         self.count = 0
         self.number_count = 0
         self.game_over = False
+        #the following are used for positioning in check function
+        self.one_right = 1
+        self.two_right = 2
+        self.three_right = 3
+        self.four_right = 4
+        self.five_right = 5
+        self.six_right = 6
+        self.one_down = 7
+        self.two_down = 14
+        self.three_down = 21
+        self.four_down = 28
+        self.five_down = 35
+
         #gem positions and gem buttons
         self.gem_1_position = Vector2()
         self.gem_1_position.x = self.size.x/4.57
@@ -376,71 +393,100 @@ class GameScene(Scene):
                                      parent = self,
                                      color = 'black',
                                      position = self.score_position)
+        #highscore label and highscore label position
+        self.highscore_position = Vector2()
+        self.highscore_position.x = self.size.x / 2
+        self.highscore_position.y = self.size.y/1.05
+        self.highscore_label = LabelNode(text = 'Highscore: 0',
+                                     font=('Helvetica', 40),
+                                     parent = self,
+                                     color = 'black',
+                                     position = self.highscore_position)
 
     def update(self):
         # this method is called, hopefully, 60 times a second
+        
         #assigns pictures depending on value
         def assign_picture(gem_value):
-			if gem_value == 1:
-				gem_picture = './assets/sprites/gem1.PNG'
-				return gem_picture
-			elif gem_value == 2:
-				gem_picture = './assets/sprites/gem2.PNG'
-				return gem_picture
-			elif gem_value == 3:
-				gem_picture = './assets/sprites/gem3.PNG'
-				return gem_picture
-			elif gem_value == 4:
-				gem_picture = './assets/sprites/gem4.PNG'
-				return gem_picture
-			elif gem_value == 5:
-				gem_picture = './assets/sprites/gem5.PNG'
-				return gem_picture
-			elif gem_value == 6:
-				gem_picture = './assets/sprites/gem6.PNG'
-				return gem_picture
-        
+            if gem_value == 1:
+                gem_picture = './assets/sprites/gem1.PNG'
+                return gem_picture
+            elif gem_value == 2:
+                gem_picture = './assets/sprites/gem2.PNG'
+                return gem_picture
+            elif gem_value == 3:
+                gem_picture = './assets/sprites/gem3.PNG'
+                return gem_picture
+            elif gem_value == 4:
+                gem_picture = './assets/sprites/gem4.PNG'
+                return gem_picture
+            elif gem_value == 5:
+                gem_picture = './assets/sprites/gem5.PNG'
+                return gem_picture
+            elif gem_value == 6:
+                gem_picture = './assets/sprites/gem6.PNG'
+                return gem_picture
+        #assigns a picture to a gem button if they are selected
+        def assign_selected_picture(gem_value):
+            if gem_value == 1:
+                gem_picture = './assets/sprites/gem_1_selected.JPG'
+                return gem_picture
+            elif gem_value == 2:
+                gem_picture = './assets/sprites/gem_2_selected.JPG'
+                return gem_picture
+            elif gem_value == 3:
+                gem_picture = './assets/sprites/gem_3_selected.JPG'
+                return gem_picture
+            elif gem_value == 4:
+                gem_picture = './assets/sprites/gem_4_selected.JPG'
+                return gem_picture
+            elif gem_value == 5:
+                gem_picture = './assets/sprites/gem_5_selected.JPG'
+                return gem_picture
+            elif gem_value == 6:
+                gem_picture = './assets/sprites/gem_6_selected.JPG'
+                return gem_picture
         #used to check for matches on the board horizontaly add points accordingly
         #items that need to be randomized are appended into to_be_removed for later randomized
-        for i in range(-1,41):
-                if self.chart[i]== self.chart[i+1]==self.chart[i+2] and (i+2)%7!=0:
-                    self.to_be_removed.append(i)
-                    self.to_be_removed.append(i+1)
-                    self.to_be_removed.append(i+2)
-                    if self.play_sound == True:
+        for gem in range(-1,41):
+                if self.chart[gem]== self.chart[gem+self.one_right]==self.chart[gem+self.two_right] and (gem+self.two_right)%7!=0:
+                    self.to_be_removed.append(gem)
+                    self.to_be_removed.append(gem+self.one_right)
+                    self.to_be_removed.append(gem+self.two_right)
+                    if self.play_sound == True and self.moves != 25:
                         #if play_sound is true play sound effect
-                        sound.play_effect('arcade:Explosion_3')
+                        sound.play_effect('./assets/sounds/Explosion_3.caf')
                     self.score = self.score+3
-                    if self.chart[i+2] == self.chart[i+3] and (i+3)%7!=0:
-                        self.to_be_removed.append(i+3)
+                    if self.chart[gem+self.two_right] == self.chart[gem+self.three_right] and (gem+self.three_right)%7!=0:
+                        self.to_be_removed.append(gem+self.three_right)
                         self.score=self.score+2
-                        if self.chart[i+3] == self.chart[i+4] and (i+4)%7!=0:
-                            self.to_be_removed.append(i+4)
+                        if self.chart[gem+self.three_right] == self.chart[gem+self.four_right] and (gem+self.four_right)%7!=0:
+                            self.to_be_removed.append(gem+self.four_right)
                             self.score=self.score+2
-                            if self.chart[i+4] == self.chart[i+5] and (i+5)%7!=0:
-                                self.to_be_removed.append(i+5)
+                            if self.chart[gem+self.four_right] == self.chart[gem+self.five_right] and (gem+self.five_right)%7!=0:
+                                self.to_be_removed.append(gem+self.five_right)
                                 self.score=self.score+2
-                                if self.chart[i+5] == self.chart[i+6] and (i+6)%7!=0:
-                                    self.to_be_removed.append(i+3)
+                                if self.chart[gem+self.five_right] == self.chart[gem+self.six_right] and (gem+self.six_right)%7!=0:
+                                    self.to_be_removed.append(gem+self.six_right)
                                     self.score=self.score+2
         #used to check for matches vertically on the board add points accordingly
         #items that need to be randomized are appended into to_be_removed for later randomized
-        for i in range(-1,41):
-                if self.chart[i]== self.chart[i+7]==self.chart[i+14]:
-                    self.to_be_removed.append(i)
-                    self.to_be_removed.append(i+7)
-                    self.to_be_removed.append(i+14)
-                    if self.play_sound == True:
-                        sound.play_effect('arcade:Explosion_3')
+        for gem in range(-1,41):
+                if self.chart[gem]== self.chart[gem+self.one_down]==self.chart[gem+self.two_down]:
+                    self.to_be_removed.append(gem)
+                    self.to_be_removed.append(gem+self.one_down)
+                    self.to_be_removed.append(gem+self.two_down)
+                    if self.play_sound == True and self.moves != 25:
+                        sound.play_effect('./assets/sounds/Explosion_3.caf')
                     self.score = self.score+3
-                    if self.chart[i+14] == self.chart[i+21]:
-                        self.to_be_removed.append(i+21)
+                    if self.chart[gem+self.two_down] == self.chart[gem+self.three_down]:
+                        self.to_be_removed.append(gem+self.three_down)
                         self.score = self.score+3
-                        if self.chart[i+21] == self.chart[i+28]:
-                            self.to_be_removed.append(i+28)
+                        if self.chart[gem+self.three_down] == self.chart[gem+self.four_down]:
+                            self.to_be_removed.append(gem+self.four_down)
                             self.score = self.score+3
-                            if self.chart[i+28] == self.chart[i+35]:
-                                self.to_be_removed.append(i+35)
+                            if self.chart[gem+self.four_down] == self.chart[gem+self.five_down]:
+                                self.to_be_removed.append(gem+self.five_down)
                                 self.score = self.score+3
 
         #randomizes the gems that have been matched
@@ -457,451 +503,156 @@ class GameScene(Scene):
             self.score = 0
 
                 
-        #if the selected is equal to zero all gems have a white background
-        if self.the_selected == 0:
-            self.gem_1_button =SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_1_position)
-            self.gem_2_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_2_position)
-            self.gem_3_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_3_position)
-            self.gem_4_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_4_position)
-            self.gem_5_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_5_position)
-            self.gem_6_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_6_position)
-            self.gem_7_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_7_position)
-            self.gem_8_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_8_position)
-            self.gem_9_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_9_position)
-            self.gem_10_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_10_position)
-            self.gem_11_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_11_position)
-            self.gem_12_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_12_position)
-            self.gem_13_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_13_position)
-            self.gem_14_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_14_position)
-            self.gem_15_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_15_position)
-            self.gem_16_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_16_position)
-            self.gem_17_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_17_position)
-            self.gem_18_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_18_position)
-            self.gem_19_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_19_position)
-            self.gem_20_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_20_position)
-            self.gem_21_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_21_position)
-            self.gem_22_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_22_position)
-            self.gem_23_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_23_position)
-            self.gem_24_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_24_position)
-            self.gem_25_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_25_position)
-            self.gem_26_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_26_position)
-            self.gem_27_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_27_position)
-            self.gem_28_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_28_position)
-            self.gem_29_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_29_position)
-            self.gem_30_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_30_position)
-            self.gem_31_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_31_position)
-            self.gem_32_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_32_position)
-            self.gem_33_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_33_position)
-            self.gem_34_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_34_position)
-            self.gem_35_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_35_position)
-            self.gem_36_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_36_position)
-            self.gem_37_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_37_position)
-            self.gem_38_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_38_position)
-            self.gem_39_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_39_position)
-            self.gem_40_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_40_position)
-            self.gem_41_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_41_position)
-            self.gem_42_button = SpriteNode('./assets/sprites/blank.JPG',
-                                           parent = self,
-                                           position = self.gem_42_position)
-                                           
-        #depending on what the_selected is equal to gives the selected gem a blue background
-        if self.the_selected == 1:
-            self.gem_1_button =SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_1_position)
-        if self.the_selected == 2:
-            self.gem_2_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_2_position)
-        if self.the_selected == 3:
-            self.gem_3_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_3_position)
-        if self.the_selected == 4:
-            self.gem_4_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_4_position)
-        if self.the_selected == 5:
-            self.gem_5_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_5_position)
-        if self.the_selected == 6:
-            self.gem_6_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_6_position)
-        if self.the_selected == 7:
-            self.gem_7_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_7_position)
-        if self.the_selected == 8:
-            self.gem_8_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_8_position)
-        if self.the_selected == 9:
-            self.gem_9_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_9_position)
-        if self.the_selected == 10:
-            self.gem_10_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_10_position)
-        if self.the_selected == 11:
-            self.gem_11_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_11_position)
-        if self.the_selected == 12:
-            self.gem_12_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_12_position)
-        if self.the_selected == 13:
-            self.gem_13_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_13_position)
-        if self.the_selected == 14:
-            self.gem_14_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_14_position)
-        if self.the_selected == 15:
-            self.gem_15_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_15_position)
-        if self.the_selected == 16:
-            self.gem_16_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_16_position)
-        if self.the_selected == 17:
-            self.gem_17_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_17_position)
-        if self.the_selected == 18:
-            self.gem_18_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_18_position)
-        if self.the_selected == 19:
-            self.gem_19_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_19_position)
-        if self.the_selected == 20:
-            self.gem_20_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_20_position)
-        if self.the_selected == 21:
-            self.gem_21_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_21_position)
-        if self.the_selected == 22:
-            self.gem_22_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_22_position)
-        if self.the_selected == 23:
-            self.gem_23_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_23_position)
-        if self.the_selected == 24:
-            self.gem_24_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_24_position)
-        if self.the_selected == 25:
-            self.gem_25_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_25_position)
-        if self.the_selected == 26:
-            self.gem_26_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_26_position)
-        if self.the_selected == 27:
-            self.gem_27_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_27_position)
-        if self.the_selected == 28:
-            self.gem_28_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_28_position)
-        if self.the_selected == 29:
-            self.gem_29_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_29_position)
-        if self.the_selected == 30:
-            self.gem_30_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_30_position)
-        if self.the_selected == 31:
-            self.gem_31_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_31_position)
-        if self.the_selected == 32:
-            self.gem_32_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_32_position)
-        if self.the_selected == 33:
-            self.gem_33_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_33_position)
-        if self.the_selected == 34:
-            self.gem_34_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_34_position)
-        if self.the_selected == 35:
-            self.gem_35_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_35_position)
-        if self.the_selected == 36:
-            self.gem_36_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_36_position)
-        if self.the_selected == 37:
-            self.gem_37_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_37_position)
-        if self.the_selected == 38:
-            self.gem_38_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_38_position)
-        if self.the_selected == 39:
-            self.gem_39_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_39_position)
-        if self.the_selected == 40:
-            self.gem_40_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_40_position)
-        if self.the_selected == 41:
-            self.gem_41_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_41_position)
-        if self.the_selected == 42:
-            self.gem_42_button = SpriteNode('./assets/sprites/Selected.PNG',
-                                           parent = self,
-                                           position = self.gem_42_position)
-        
         #updates each picture depending on their new value
-        self.gem_1_button =SpriteNode(assign_picture(self.chart[0]),
-                                       parent = self,
-                                       position = self.gem_1_position)
-        self.gem_2_button = SpriteNode(assign_picture(self.chart[1]),
-                                       parent = self,
-                                       position = self.gem_2_position)
-        self.gem_3_button = SpriteNode(assign_picture(self.chart[2]),
-                                       parent = self,
-                                       position = self.gem_3_position)
-        self.gem_4_button = SpriteNode(assign_picture(self.chart[3]),
-                                       parent = self,
-                                       position = self.gem_4_position)
-        self.gem_5_button = SpriteNode(assign_picture(self.chart[4]),
-                                       parent = self,
-                                       position = self.gem_5_position)
-        self.gem_6_button = SpriteNode(assign_picture(self.chart[5]),
-                                       parent = self,
-                                       position = self.gem_6_position)
-        self.gem_7_button = SpriteNode(assign_picture(self.chart[6]),
-                                       parent = self,
-                                       position = self.gem_7_position)
-        self.gem_8_button = SpriteNode(assign_picture(self.chart[7]),
-                                       parent = self,
-                                       position = self.gem_8_position)
-        self.gem_9_button = SpriteNode(assign_picture(self.chart[8]),
-                                       parent = self,
-                                       position = self.gem_9_position)
-        self.gem_10_button = SpriteNode(assign_picture(self.chart[9]),
-                                       parent = self,
-                                       position = self.gem_10_position)
-        self.gem_11_button = SpriteNode(assign_picture(self.chart[10]),
-                                       parent = self,
-                                       position = self.gem_11_position)
-        self.gem_12_button = SpriteNode(assign_picture(self.chart[11]),
-                                       parent = self,
-                                       position = self.gem_12_position)
-        self.gem_13_button = SpriteNode(assign_picture(self.chart[12]),
-                                       parent = self,
-                                       position = self.gem_13_position)
-        self.gem_14_button = SpriteNode(assign_picture(self.chart[13]),
-                                       parent = self,
-                                       position = self.gem_14_position)
-        self.gem_15_button = SpriteNode(assign_picture(self.chart[14]),
-                                       parent = self,
-                                       position = self.gem_15_position)
-        self.gem_16_button = SpriteNode(assign_picture(self.chart[15]),
-                                       parent = self,
-                                       position = self.gem_16_position)
-        self.gem_17_button = SpriteNode(assign_picture(self.chart[16]),
-                                       parent = self,
-                                       position = self.gem_17_position)
-        self.gem_18_button = SpriteNode(assign_picture(self.chart[17]),
-                                       parent = self,
-                                       position = self.gem_18_position)
-        self.gem_19_button = SpriteNode(assign_picture(self.chart[18]),
-                                       parent = self,
-                                       position = self.gem_19_position)
-        self.gem_20_button = SpriteNode(assign_picture(self.chart[19]),
-                                       parent = self,
-                                       position = self.gem_20_position)
-        self.gem_21_button = SpriteNode(assign_picture(self.chart[20]),
-                                       parent = self,
-                                       position = self.gem_21_position)
-        self.gem_22_button = SpriteNode(assign_picture(self.chart[21]),
-                                       parent = self,
-                                       position = self.gem_22_position)
-        self.gem_23_button = SpriteNode(assign_picture(self.chart[22]),
-                                       parent = self,
-                                       position = self.gem_23_position)
-        self.gem_24_button = SpriteNode(assign_picture(self.chart[23]),
-                                       parent = self,
-                                       position = self.gem_24_position)
-        self.gem_25_button = SpriteNode(assign_picture(self.chart[24]),
-                                       parent = self,
-                                       position = self.gem_25_position)
-        self.gem_26_button = SpriteNode(assign_picture(self.chart[25]),
-                                       parent = self,
-                                       position = self.gem_26_position)
-        self.gem_27_button = SpriteNode(assign_picture(self.chart[26]),
-                                       parent = self,
-                                       position = self.gem_27_position)
-        self.gem_28_button = SpriteNode(assign_picture(self.chart[27]),
-                                       parent = self,
-                                       position = self.gem_28_position)
-        self.gem_29_button = SpriteNode(assign_picture(self.chart[28]),
-                                       parent = self,
-                                       position = self.gem_29_position)
-        self.gem_30_button = SpriteNode(assign_picture(self.chart[29]),
-                                       parent = self,
-                                       position = self.gem_30_position)
-        self.gem_31_button = SpriteNode(assign_picture(self.chart[30]),
-                                       parent = self,
-                                       position = self.gem_31_position)
-        self.gem_32_button = SpriteNode(assign_picture(self.chart[31]),
-                                       parent = self,
-                                       position = self.gem_32_position)
-        self.gem_33_button = SpriteNode(assign_picture(self.chart[32]),
-                                       parent = self,
-                                       position = self.gem_33_position)
-        self.gem_34_button = SpriteNode(assign_picture(self.chart[33]),
-                                       parent = self,
-                                       position = self.gem_34_position)
-        self.gem_35_button = SpriteNode(assign_picture(self.chart[34]),
-                                       parent = self,
-                                       position = self.gem_35_position)
-        self.gem_36_button = SpriteNode(assign_picture(self.chart[35]),
-                                       parent = self,
-                                       position = self.gem_36_position)
-        self.gem_37_button = SpriteNode(assign_picture(self.chart[36]),
-                                       parent = self,
-                                       position = self.gem_37_position)
-        self.gem_38_button = SpriteNode(assign_picture(self.chart[37]),
-                                       parent = self,
-                                       position = self.gem_38_position)
-        self.gem_39_button = SpriteNode(assign_picture(self.chart[38]),
-                                       parent = self,
-                                       position = self.gem_39_position)
-        self.gem_40_button = SpriteNode(assign_picture(self.chart[39]),
-                                       parent = self,
-                                       position = self.gem_40_position)
-        self.gem_41_button = SpriteNode(assign_picture(self.chart[40]),
-                                       parent = self,
-                                       position = self.gem_41_position)
-        self.gem_42_button = SpriteNode(assign_picture(self.chart[41]),
-                                       parent = self,
-                                       position = self.gem_42_position)
+        self.gem_1_button.texture =Texture(assign_picture(self.chart[0]))
+        self.gem_2_button.texture =Texture(assign_picture(self.chart[1]))
+        self.gem_3_button.texture =Texture(assign_picture(self.chart[2]))
+        self.gem_4_button.texture =Texture(assign_picture(self.chart[3]))
+        self.gem_5_button.texture =Texture(assign_picture(self.chart[4]))
+        self.gem_6_button.texture =Texture(assign_picture(self.chart[5]))
+        self.gem_7_button.texture =Texture(assign_picture(self.chart[6]))
+        self.gem_8_button.texture =Texture(assign_picture(self.chart[7]))
+        self.gem_9_button.texture =Texture(assign_picture(self.chart[8]))
+        self.gem_10_button.texture =Texture(assign_picture(self.chart[9]))
+        self.gem_11_button.texture =Texture(assign_picture(self.chart[10]))
+        self.gem_12_button.texture =Texture(assign_picture(self.chart[11]))
+        self.gem_13_button.texture =Texture(assign_picture(self.chart[12]))
+        self.gem_14_button.texture =Texture(assign_picture(self.chart[13]))
+        self.gem_15_button.texture =Texture(assign_picture(self.chart[14]))
+        self.gem_16_button.texture =Texture(assign_picture(self.chart[15]))
+        self.gem_17_button.texture =Texture(assign_picture(self.chart[16]))
+        self.gem_18_button.texture =Texture(assign_picture(self.chart[17]))
+        self.gem_19_button.texture =Texture(assign_picture(self.chart[18]))
+        self.gem_20_button.texture =Texture(assign_picture(self.chart[19]))
+        self.gem_21_button.texture =Texture(assign_picture(self.chart[20]))
+        self.gem_22_button.texture =Texture(assign_picture(self.chart[21]))
+        self.gem_23_button.texture =Texture(assign_picture(self.chart[22]))
+        self.gem_24_button.texture =Texture(assign_picture(self.chart[23]))
+        self.gem_25_button.texture =Texture(assign_picture(self.chart[24]))
+        self.gem_26_button.texture =Texture(assign_picture(self.chart[25]))
+        self.gem_27_button.texture =Texture(assign_picture(self.chart[26]))
+        self.gem_28_button.texture =Texture(assign_picture(self.chart[27]))
+        self.gem_29_button.texture =Texture(assign_picture(self.chart[28]))
+        self.gem_30_button.texture =Texture(assign_picture(self.chart[29]))
+        self.gem_31_button.texture =Texture(assign_picture(self.chart[30]))
+        self.gem_32_button.texture =Texture(assign_picture(self.chart[31]))
+        self.gem_33_button.texture =Texture(assign_picture(self.chart[32]))
+        self.gem_34_button.texture =Texture(assign_picture(self.chart[33]))
+        self.gem_35_button.texture =Texture(assign_picture(self.chart[34]))
+        self.gem_36_button.texture =Texture(assign_picture(self.chart[35]))
+        self.gem_37_button.texture =Texture(assign_picture(self.chart[36]))
+        self.gem_38_button.texture =Texture(assign_picture(self.chart[37]))
+        self.gem_39_button.texture =Texture(assign_picture(self.chart[38]))
+        self.gem_40_button.texture =Texture(assign_picture(self.chart[39]))
+        self.gem_41_button.texture =Texture(assign_picture(self.chart[40]))
+        self.gem_42_button.texture =Texture(assign_picture(self.chart[41]))
         # if play_sound is True, sound on button is shown
         if self.play_sound == True:
-            self.sound_button = SpriteNode('./assets/sprites/sound_on.PNG',
-                              parent = self,
-                              position = self.sound_button_position,
-                              scale = 2)
+            self.sound_button.texture = Texture('./assets/sprites/sound_on.PNG')
         # if play_sound is False, sound off button is shown
         if self.play_sound == False:
-            self.sound_button = SpriteNode('./assets/sprites/sound_off.PNG',
-                              parent = self,
-                              position = self.sound_button_position,
-                              scale = 2)
-        
+            self.sound_button.texture = Texture('./assets/sprites/sound_off.PNG')
+        #depending on what the_selected is equal to gives the selected gem a new picture
+        if self.the_selected == 1:
+            self.gem_1_button.texture =Texture(assign_selected_picture(self.chart[0]))
+        if self.the_selected == 2:
+            self.gem_2_button.texture =Texture(assign_selected_picture(self.chart[1]))
+        if self.the_selected == 3:
+            self.gem_3_button.texture =Texture(assign_selected_picture(self.chart[2]))
+        if self.the_selected == 4:
+            self.gem_4_button.texture =Texture(assign_selected_picture(self.chart[3]))
+        if self.the_selected == 5:
+            self.gem_5_button.texture =Texture(assign_selected_picture(self.chart[4]))
+        if self.the_selected == 6:
+            self.gem_6_button.texture =Texture(assign_selected_picture(self.chart[5]))
+        if self.the_selected == 7:
+            self.gem_7_button.texture =Texture(assign_selected_picture(self.chart[6]))
+        if self.the_selected == 8:
+            self.gem_8_button.texture =Texture(assign_selected_picture(self.chart[7]))
+        if self.the_selected == 9:
+            self.gem_9_button.texture =Texture(assign_selected_picture(self.chart[8]))
+        if self.the_selected == 10:
+            self.gem_10_button.texture =Texture(assign_selected_picture(self.chart[9]))
+        if self.the_selected == 11:
+            self.gem_11_button.texture =Texture(assign_selected_picture(self.chart[10]))
+        if self.the_selected == 12:
+            self.gem_12_button.texture =Texture(assign_selected_picture(self.chart[11]))
+        if self.the_selected == 13:
+            self.gem_13_button.texture =Texture(assign_selected_picture(self.chart[12]))
+        if self.the_selected == 14:
+            self.gem_14_button.texture =Texture(assign_selected_picture(self.chart[13]))
+        if self.the_selected == 15:
+            self.gem_15_button.texture =Texture(assign_selected_picture(self.chart[14]))
+        if self.the_selected == 16:
+            self.gem_16_button.texture =Texture(assign_selected_picture(self.chart[15]))
+        if self.the_selected == 17:
+            self.gem_17_button.texture =Texture(assign_selected_picture(self.chart[16]))
+        if self.the_selected == 18:
+            self.gem_18_button.texture =Texture(assign_selected_picture(self.chart[17]))
+        if self.the_selected == 19:
+            self.gem_19_button.texture =Texture(assign_selected_picture(self.chart[18]))
+        if self.the_selected == 20:
+            self.gem_20_button.texture =Texture(assign_selected_picture(self.chart[19]))
+        if self.the_selected == 21:
+            self.gem_21_button.texture =Texture(assign_selected_picture(self.chart[20]))
+        if self.the_selected == 22:
+            self.gem_22_button.texture =Texture(assign_selected_picture(self.chart[21]))
+        if self.the_selected == 23:
+            self.gem_23_button.texture =Texture(assign_selected_picture(self.chart[22]))
+        if self.the_selected == 24:
+            self.gem_24_button.texture =Texture(assign_selected_picture(self.chart[23]))
+        if self.the_selected == 25:
+            self.gem_25_button.texture =Texture(assign_selected_picture(self.chart[24]))
+        if self.the_selected == 26:
+            self.gem_26_button.texture =Texture(assign_selected_picture(self.chart[25]))
+        if self.the_selected == 27:
+            self.gem_27_button.texture =Texture(assign_selected_picture(self.chart[26]))
+        if self.the_selected == 28:
+            self.gem_28_button.texture =Texture(assign_selected_picture(self.chart[27]))
+        if self.the_selected == 29:
+            self.gem_29_button.texture =Texture(assign_selected_picture(self.chart[28]))
+        if self.the_selected == 30:
+            self.gem_30_button.texture =Texture(assign_selected_picture(self.chart[29]))
+        if self.the_selected == 31:
+            self.gem_31_button.texture =Texture(assign_selected_picture(self.chart[30]))
+        if self.the_selected == 32:
+            self.gem_32_button.texture =Texture(assign_selected_picture(self.chart[31]))
+        if self.the_selected == 33:
+            self.gem_33_button.texture =Texture(assign_selected_picture(self.chart[32]))
+        if self.the_selected == 34:
+            self.gem_34_button.texture =Texture(assign_selected_picture(self.chart[33]))
+        if self.the_selected == 35:
+            self.gem_35_button.texture =Texture(assign_selected_picture(self.chart[34]))
+        if self.the_selected == 36:
+            self.gem_36_button.texture =Texture(assign_selected_picture(self.chart[35]))
+        if self.the_selected == 37:
+            self.gem_37_button.texture =Texture(assign_selected_picture(self.chart[36]))
+        if self.the_selected == 38:
+            self.gem_38_button.texture =Texture(assign_selected_picture(self.chart[37]))
+        if self.the_selected == 39:
+            self.gem_39_button.texture =Texture(assign_selected_picture(self.chart[38]))
+        if self.the_selected == 40:
+            self.gem_40_button.texture =Texture(assign_selected_picture(self.chart[39]))
+        if self.the_selected == 41:
+            self.gem_41_button.texture =Texture(assign_selected_picture(self.chart[40]))
+        if self.the_selected == 42:
+            self.gem_42_button.texture =Texture(assign_selected_picture(self.chart[41]))
         #update moves and score label values
         self.moves_label.text = 'Moves: ' + str(self.moves)
         self.score_label.text = 'Score: ' + str(self.score)
+        if self.score >= self.highscore:
+            self.highscore_label.text = 'Highscore: ' + str(self.score)
+        else:
+            self.highscore_label.text = 'Highscore: ' + str(self.highscore)
         #if moves is zero, gameover happens and the main menu button appears
         if self.moves == 0:
             self.game_over = True
+            self.the_highscore.append(self.score)
+            self.highscore = max(self.the_highscore)
+            self.top_scores_file.seek(0)
+            json.dump(self.the_highscore, self.top_scores_file)
+            self.top_scores_file.close()
+            print(self.highscore)
             self.menu_button = SpriteNode('./assets/sprites/menu_button.png',
                                       parent = self,
                                       position = self.menu_button_position,
@@ -935,7 +686,7 @@ class GameScene(Scene):
 
         #all of the following applies to all gem buttons
         #if the gem is pushed 
-        if self.gem_1_button.frame.contains_point(touch.location):
+        if self.gem_1_button.frame.contains_point(touch.location) and self.game_over == False:
             #if another gem was already pushed
             if self.another_gem_pushed == True:
                 #swaps the two selected tiles values
@@ -944,7 +695,8 @@ class GameScene(Scene):
                 #another gem pushed is now false
                 self.another_gem_pushed = False
                 #reduced number of moves by 1
-                self.moves= self.moves-1
+                if self.the_selected != 1:
+                    self.moves= self.moves-1
                 #the_selected is now zero making all backgrounds white
                 self.the_selected = 0
                 
@@ -955,12 +707,13 @@ class GameScene(Scene):
                 self.selected = 0
                 self.the_selected = 1
                 
-        if self.gem_2_button.frame.contains_point(touch.location):
+        if self.gem_2_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[1]
                 self.chart[1] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 2:
+                    self.moves= self.moves-1
                 self.the_selected = 0
                 
             else:
@@ -968,36 +721,39 @@ class GameScene(Scene):
                 self.placeholder = self.chart[1]
                 self.selected = 1
                 self.the_selected = 2
-        if self.gem_3_button.frame.contains_point(touch.location):
+        if self.gem_3_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[2]
                 self.chart[2] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 3:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[2]
                 self.selected = 2
                 self.the_selected = 3
-        if self.gem_4_button.frame.contains_point(touch.location):
+        if self.gem_4_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[3]
                 self.chart[3] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 4:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[3]
                 self.selected = 3
                 self.the_selected = 4
-        if self.gem_5_button.frame.contains_point(touch.location):
+        if self.gem_5_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.another_gem_pushed = False
                 self.chart[self.selected]=self.chart[4]
                 self.chart[4] = self.placeholder
-                self.moves= self.moves-1
+                if self.the_selected != 5:
+                    self.moves= self.moves-1
                 self.the_selected = 0
                 
             else:
@@ -1005,12 +761,13 @@ class GameScene(Scene):
                 self.placeholder = self.chart[4]
                 self.selected = 4
                 self.the_selected = 5
-        if self.gem_6_button.frame.contains_point(touch.location):
+        if self.gem_6_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[5]
                 self.chart[5] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 6:
+                    self.moves= self.moves-1
                 self.the_selected = 0
                 
             else:
@@ -1018,12 +775,13 @@ class GameScene(Scene):
                 self.placeholder = self.chart[5]
                 self.selected = 5
                 self.the_selected = 6
-        if self.gem_7_button.frame.contains_point(touch.location):
+        if self.gem_7_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[6]
                 self.chart[6] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 7:
+                    self.moves= self.moves-1
                 self.the_selected = 0
                 
             else:
@@ -1032,25 +790,27 @@ class GameScene(Scene):
                 self.selected = 6
                 self.the_selected = 7
                 
-        if self.gem_8_button.frame.contains_point(touch.location):
+        if self.gem_8_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[7]
                 self.chart[7] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 8:
+                    self.moves= self.moves-1
                 self.the_selected = 0
                 
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[7]
                 self.selected = 7
-                self.the_selected = 0
-        if self.gem_9_button.frame.contains_point(touch.location):
+                self.the_selected = 8
+        if self.gem_9_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[8]
                 self.chart[8] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 9:
+                    self.moves= self.moves-1
                 self.the_selected = 0
                 
             else:
@@ -1058,12 +818,13 @@ class GameScene(Scene):
                 self.placeholder = self.chart[8]
                 self.selected = 8
                 self.the_selected = 9
-        if self.gem_10_button.frame.contains_point(touch.location):
+        if self.gem_10_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[9]
                 self.chart[9] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 10:
+                    self.moves= self.moves-1
                 self.the_selected = 0
                 
             else:
@@ -1071,12 +832,13 @@ class GameScene(Scene):
                 self.placeholder = self.chart[9]
                 self.selected = 9
                 self.the_selected = 10
-        if self.gem_11_button.frame.contains_point(touch.location):
+        if self.gem_11_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[10]
                 self.chart[10] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 11:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
@@ -1084,216 +846,234 @@ class GameScene(Scene):
                 self.selected = 10
                 self.the_selected = 11
                 
-        if self.gem_12_button.frame.contains_point(touch.location):
+        if self.gem_12_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[11]
                 self.chart[11] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 12:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[11]
                 self.selected = 11
-                self.the_selected = 0
-        if self.gem_13_button.frame.contains_point(touch.location):
+                self.the_selected = 12
+        if self.gem_13_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[12]
                 self.chart[12] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 13:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[12]
                 self.selected = 12
                 self.the_selected = 13
-        if self.gem_14_button.frame.contains_point(touch.location):
+        if self.gem_14_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[13]
                 self.chart[13] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 14:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[13]
                 self.selected = 13
                 self.the_selected = 14
-        if self.gem_15_button.frame.contains_point(touch.location):
+        if self.gem_15_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[14]
                 self.chart[14] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 15:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[14]
                 self.selected = 14
                 self.the_selected = 15
-        if self.gem_16_button.frame.contains_point(touch.location):
+        if self.gem_16_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[15]
                 self.chart[15] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 16:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[15]
                 self.selected = 15
                 self.the_selected = 16
-        if self.gem_17_button.frame.contains_point(touch.location):
+        if self.gem_17_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[16]
                 self.chart[16] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 17:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[16]
                 self.selected = 16
                 self.the_selected = 17
-        if self.gem_18_button.frame.contains_point(touch.location):
+        if self.gem_18_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[17]
                 self.chart[17] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 18:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[17]
                 self.selected = 17
                 self.the_selected = 18
-        if self.gem_19_button.frame.contains_point(touch.location):
+        if self.gem_19_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[18]
                 self.chart[18] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 19:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[18]
                 self.selected = 18
                 self.the_selected = 19
-        if self.gem_20_button.frame.contains_point(touch.location):
+        if self.gem_20_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[19]
                 self.chart[19] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 20:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[19]
                 self.selected = 19
                 self.the_selected = 20
-        if self.gem_21_button.frame.contains_point(touch.location):
+        if self.gem_21_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[20]
                 self.chart[20] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 21:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[20]
                 self.selected = 20
                 self.the_selected = 21
-        if self.gem_22_button.frame.contains_point(touch.location):
+        if self.gem_22_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[21]
                 self.chart[21] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 22:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[21]
                 self.selected = 21
                 self.the_selected = 22
-        if self.gem_23_button.frame.contains_point(touch.location):
+        if self.gem_23_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[22]
                 self.chart[22] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 23:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[22]
                 self.selected = 22
                 self.the_selected = 23
-        if self.gem_24_button.frame.contains_point(touch.location):
+        if self.gem_24_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[23]
                 self.chart[23] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 24:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[23]
                 self.selected = 23
                 self.the_selected = 24
-        if self.gem_25_button.frame.contains_point(touch.location):
+        if self.gem_25_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[24]
                 self.chart[24] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 25:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[24]
                 self.selected = 24
                 self.the_selected = 25
-        if self.gem_26_button.frame.contains_point(touch.location):
+        if self.gem_26_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[25]
                 self.chart[25] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 26:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[25]
                 self.selected = 25
                 self.the_selected = 26
-        if self.gem_27_button.frame.contains_point(touch.location):
+        if self.gem_27_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[26]
                 self.chart[26] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 27:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[26]
                 self.selected = 26
                 self.the_selected = 27
-        if self.gem_28_button.frame.contains_point(touch.location):
+        if self.gem_28_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[27]
                 self.chart[27] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 28:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[27]
                 self.selected = 27
                 self.the_selected = 28
-        if self.gem_29_button.frame.contains_point(touch.location):
+        if self.gem_29_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[28]
                 self.chart[28] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 29:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
@@ -1301,156 +1081,169 @@ class GameScene(Scene):
                 self.selected = 28
                 self.the_selected = 29
                 
-        if self.gem_30_button.frame.contains_point(touch.location):
+        if self.gem_30_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[29]
                 self.chart[29] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 30:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[29]
                 self.selected = 29
                 self.the_selected = 30
-        if self.gem_31_button.frame.contains_point(touch.location):
+        if self.gem_31_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[30]
                 self.chart[30] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 30:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[30]
                 self.selected = 30
                 self.the_selected = 31
-        if self.gem_32_button.frame.contains_point(touch.location):
+        if self.gem_32_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[31]
                 self.chart[31] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 32:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[31]
                 self.selected = 31
                 self.the_selected = 32
-        if self.gem_33_button.frame.contains_point(touch.location):
+        if self.gem_33_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[32]
                 self.chart[32] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 33:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[32]
                 self.selected = 32
                 self.the_selected = 33
-        if self.gem_34_button.frame.contains_point(touch.location):
+        if self.gem_34_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[33]
                 self.chart[33] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 34:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[33]
                 self.selected = 33
                 self.the_selected = 34
-        if self.gem_35_button.frame.contains_point(touch.location):
+        if self.gem_35_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[34]
                 self.chart[34] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 35:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[34]
                 self.selected = 34
                 self.the_selected = 35
-        if self.gem_36_button.frame.contains_point(touch.location):
+        if self.gem_36_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[35]
                 self.chart[35] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 36:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[35]
                 self.selected = 35
                 self.the_selected = 36
-        if self.gem_37_button.frame.contains_point(touch.location):
+        if self.gem_37_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[36]
                 self.chart[36] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 37:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[36]
                 self.selected = 36
                 self.the_selected = 37
-        if self.gem_38_button.frame.contains_point(touch.location):
+        if self.gem_38_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[37]
                 self.chart[37] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 38:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[37]
                 self.selected = 37
                 self.the_selected = 38
-        if self.gem_39_button.frame.contains_point(touch.location):
+        if self.gem_39_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[38]
                 self.chart[38] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 39:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[38]
                 self.selected = 38
                 self.the_selected = 39
-        if self.gem_40_button.frame.contains_point(touch.location):
+        if self.gem_40_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[39]
                 self.chart[39] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 40:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[39]
                 self.selected = 39
                 self.the_selected = 40
-        if self.gem_41_button.frame.contains_point(touch.location):
+        if self.gem_41_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[40]
                 self.chart[40] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 41:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
                 self.placeholder = self.chart[40]
                 self.selected = 40
                 self.the_selected = 41
-        if self.gem_42_button.frame.contains_point(touch.location):
+        if self.gem_42_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
                 self.chart[self.selected]=self.chart[42]
                 self.chart[41] = self.placeholder
                 self.another_gem_pushed = False
-                self.moves= self.moves-1
+                if self.the_selected != 42:
+                    self.moves= self.moves-1
                 self.the_selected = 0
             else:
                 self.another_gem_pushed = True
@@ -1480,4 +1273,3 @@ class GameScene(Scene):
         # this method is called, when user place app from background 
         # back into use. Reload anything you might need.
         pass
-    
