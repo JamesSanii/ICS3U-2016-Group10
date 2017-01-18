@@ -85,9 +85,9 @@ class GameScene(Scene):
                                       scale = 2)
         #number of tiles
         self.tile_number=100
-        #array that holds all gem values
+        #list that holds all gem values
         self.chart = []
-		#put numbers in array
+		#put numbers in list
         for number in range(0, self.tile_number):
             self.chart.append(random.randint(1, 6))
         #values added to remove bug of matching gems to gems that are not displayed on screen but exist so the checking for matches work properly 
@@ -507,7 +507,7 @@ class GameScene(Scene):
             while number in self.to_be_removed:
                 #since a number may be appended multiple times it needs to be removed multiple times
                 self.to_be_removed.remove(number)
-                #score is adjusted based off how many extra times it was added to the array
+                #score is adjusted based off how many extra times it was added to the list
                 self.score = self.score-1
         #assignes the score to zero until a move is made
         if self.moves == 25:
