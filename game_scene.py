@@ -74,6 +74,7 @@ class GameScene(Scene):
                                        parent = self,
                                        position = self.pause_button_position,
                                        scale = 0.5)
+        #sound button location
         self.sound_button_position = Vector2()
         self.sound_button_position.x = self.size.x/10
         self.sound_button_position.y = self.size.y/8
@@ -89,17 +90,27 @@ class GameScene(Scene):
 		#put numbers in array
         for number in range(0, self.tile_number):
             self.chart.append(random.randint(1, 6))
-        
+        #values added to remove bug of matching gems to gems that are not displayed on screen but exist so the checking for matches work properly 
+        self.chart[42] = 7
+        self.chart[43] = 8
+        self.chart[44] = 9
+        self.chart[45] = 10
+        self.chart[46] = 11
+        self.chart[47] = 12
+        self.chart[48] = 13
         #variables
+        # initialization of json file, and related variables
         self.top_scores_file = open('./highscore.txt' , 'r+')
         self.the_highscore = json.load(self.top_scores_file)
         self.highscore = max(self.the_highscore)
         self.highscore_written_yet = False
+        #which gem is selected
         self.the_selected = 0
+        #sound on or off
         self.play_sound = True
+        #score variable
         self.score = 0
-        self.count = 0
-        self.number_count = 0
+        #
         self.game_over = False
         #the following are used for positioning in check function
         self.one_right = 1
@@ -1241,7 +1252,7 @@ class GameScene(Scene):
                 self.the_selected = 41
         if self.gem_42_button.frame.contains_point(touch.location) and self.game_over == False:
             if self.another_gem_pushed == True:
-                self.chart[self.selected]=self.chart[42]
+                self.chart[self.selected]=self.chart[41]
                 self.chart[41] = self.placeholder
                 self.another_gem_pushed = False
                 if self.the_selected != 42:
