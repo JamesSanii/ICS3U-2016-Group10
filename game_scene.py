@@ -45,7 +45,7 @@ class GameScene(Scene):
                                      size = self.size)
         # variable that is used to see if another gem is selected to be swapped
         self.another_gem_pushed = False
-        #gems that need to be randomized are put into this array
+        #gems that need to be randomized are put into this list
         self.to_be_removed = []
         #create position for main_menu_button
         self.main_menu_button_position = Vector2()
