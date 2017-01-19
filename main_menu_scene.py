@@ -19,20 +19,22 @@ class MainMenuScene(Scene):
                                      color = 'white', 
                                      parent = self, 
                                      size = self.size)
-                                     
+        #create start button
         self.start_button = SpriteNode('./assets/sprites/start.png',
                                        parent = self,
                                        position = self.size/2)
-                                       
+        #create help button position
         self.help_button_position = self.size/2
-        self.help_button_position.y = self.help_button_position.y - 200
+        self.help_button_position.y = self.help_button_position.y/2
+        #create help button
         self.help_button = SpriteNode('./assets/sprites/help.png',
                                        parent = self,
                                        position = self.help_button_position)
-        
+        #create credits button position
         self.credits_button_position = Vector2()
         self.credits_button_position.y = self.size.y/1.3
         self.credits_button_position.x = self.size.x/2
+        #create credits button
         self.credits_button = SpriteNode('./assets/sprites/Credits.PNG',
                                        parent = self,
                                        position = self.credits_button_position,
@@ -52,14 +54,14 @@ class MainMenuScene(Scene):
     def touch_ended(self, touch):
         # this method is called, when user releases a finger from the screen
         
-        # if start button is pressed, goto game scene
+        # if start button is pressed, go to game scene
         if self.start_button.frame.contains_point(touch.location):
             self.present_modal_scene(GameScene())
             
-        # if start button is pressed, goto game scene
+        # if help button is pressed, go to help scene
         if self.help_button.frame.contains_point(touch.location):
             self.present_modal_scene(HelpScene())
-        
+        # if credits button is pressed, go to credits scene
         if self.credits_button.frame.contains_point(touch.location):
             self.present_modal_scene(CreditsScene())
     def did_change_size(self):
