@@ -56,10 +56,11 @@ class HelpScene(Scene):
                                       font=('Helvetica', 20),
                                       parent = self,
                                       position = self.rule_5_position)
-        #create back button
+        #create back button position
         back_button_position = Vector2()
         back_button_position.x = self.size.x / 8
         back_button_position.y = self.size.y / 1.25
+        #create back button
         self.back_button = SpriteNode('./assets/sprites/back_button.png',
                                        parent = self,
                                        position = back_button_position)
