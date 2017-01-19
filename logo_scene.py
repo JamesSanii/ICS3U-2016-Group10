@@ -1,7 +1,7 @@
 # Created by: James Sanii
 # Created on: Dec 2016
 # Created for: ICS3U
-# This scene shows a splash screen for 2 seconds,
+# This scene shows a logo screen for 2 seconds,
 #   then transitions to the main menu.
 
 from scene import *
