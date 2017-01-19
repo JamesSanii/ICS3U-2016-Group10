@@ -1,8 +1,9 @@
-# Created by: James
+    # Created by: James
 # Created on: Dec 2016
 # Created for: ICS3U
 # This scene shows the main menu.
 
+#all the needed imports from python library
 from scene import *
 from main_menu_scene import *
 from pause_scene import *
@@ -11,12 +12,10 @@ import random
 import time
 import sound
 import json
-class GameScene(Scene):
-	
-	
-		
+
+class GameScene(Scene):	
+
     def setup(self):
-        # this method is called, when user moves to this scene
         #function that assigns pictures to each gem button
         def assign_picture(gem_value):
             if gem_value == 1:
@@ -90,7 +89,7 @@ class GameScene(Scene):
 		#put numbers in list
         for number in range(0, self.tile_number):
             self.chart.append(random.randint(1, 6))
-        #values added to remove bug of matching gems to gems that are not displayed on screen but exist so the checking for matches work properly 
+        #values added to remove bug of matching gems to gems that are not displayed on screen but exist so the checking for matches works properly 
         self.chart[42] = 7
         self.chart[43] = 8
         self.chart[44] = 9
@@ -110,7 +109,7 @@ class GameScene(Scene):
         self.play_sound = True
         #score variable
         self.score = 0
-        #
+        #is it gameover variable
         self.game_over = False
         #the following are used for positioning in check function
         self.one_right = 1
@@ -387,27 +386,31 @@ class GameScene(Scene):
                                        position = self.gem_42_position)
         #create moves initial value and moves label that displays the number of moves
         self.moves = 25
+        #move label position
         self.moves_position = Vector2()
         self.moves_position.x = self.size.x / 10
         self.moves_position.y = self.size.y/1.5
+        #create move label
         self.moves_label = LabelNode(text = 'moves: 0',
                                      font=('Helvetica', 40),
                                      parent = self,
                                      color = 'black',
                                      position = self.moves_position)
-        #create score label and shows score to user
+        #create score label position
         self.score_position = Vector2()
         self.score_position.x = self.size.x / 10
         self.score_position.y = self.size.y/1.05
+        #create score label
         self.score_label = LabelNode(text = 'score: 0',
                                      font=('Helvetica', 40),
                                      parent = self,
                                      color = 'black',
                                      position = self.score_position)
-        #highscore label and highscore label position
+        #highscore label position
         self.highscore_position = Vector2()
         self.highscore_position.x = self.size.x / 2
         self.highscore_position.y = self.size.y/1.05
+        #highscore label
         self.highscore_label = LabelNode(text = 'Highscore: 0',
                                      font=('Helvetica', 40),
                                      parent = self,
@@ -458,7 +461,7 @@ class GameScene(Scene):
                 gem_picture = './assets/sprites/gem_6_selected.JPG'
                 return gem_picture
         #used to check for matches on the board horizontaly add points accordingly
-        #items that need to be randomized are appended into to_be_removed for later randomized
+        #items that need to be randomized are appended into to_be_removed for and are randomized later
         for gem in range(-1,41):
                 if self.chart[gem]== self.chart[gem+self.one_right]==self.chart[gem+self.two_right] and (gem+self.two_right)%7!=0:
                     self.to_be_removed.append(gem)
@@ -481,7 +484,7 @@ class GameScene(Scene):
                                     self.to_be_removed.append(gem+self.six_right)
                                     self.score=self.score+2
         #used to check for matches vertically on the board add points accordingly
-        #items that need to be randomized are appended into to_be_removed for later randomized
+        #items that need to be randomized are appended into to_be_removed and are randomized later
         for gem in range(-1,41):
                 if self.chart[gem]== self.chart[gem+self.one_down]==self.chart[gem+self.two_down]:
                     self.to_be_removed.append(gem)
@@ -651,9 +654,11 @@ class GameScene(Scene):
         #update moves and score label values
         self.moves_label.text = 'Moves: ' + str(self.moves)
         self.score_label.text = 'Score: ' + str(self.score)
+        #if self.score is greater or equal to self.highscore the highscore label will display the score because it is the new highscore, but it isnt saved until the end of the game
         if self.score >= self.highscore:
             self.highscore_label.text = 'Highscore: ' + str(self.score)
         else:
+            #if highscore is greater then score highscore label displays highscore
             self.highscore_label.text = 'Highscore: ' + str(self.highscore)
         #if moves is zero, gameover happens and the main menu button appears
         if self.moves == 0:
@@ -662,16 +667,15 @@ class GameScene(Scene):
                                       parent = self,
                                       position = self.menu_button_position,
                                       alpha = 1.0)
+            # if the highscore has not been written yet, write highscore to the highscore text file, then close the file
             if self.highscore_written_yet == False:
+                self.highscore_written_yet = True
                 self.the_highscore.append(self.score)
+                #highscore is assigned to the greatest number in the file
                 self.highscore = max(self.the_highscore)
                 self.top_scores_file.seek(0)
                 json.dump(self.the_highscore, self.top_scores_file)
                 self.top_scores_file.close()
-                print(self.highscore)
-            
-        
-        
     
     def touch_began(self, touch):
         # this method is called, when user touches the screen
@@ -1286,3 +1290,4 @@ class GameScene(Scene):
         # this method is called, when user place app from background 
         # back into use. Reload anything you might need.
         pass
+Raw
