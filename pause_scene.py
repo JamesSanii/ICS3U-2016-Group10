@@ -13,8 +13,6 @@ class PauseScene(Scene):
     def setup(self):
         # this method is called, when user moves to this scene
         
-        center_of_screen = self.size/2
-        
         # add background color
         self.background = SpriteNode(position = self.size / 2, 
                                      color = 'blue', 
@@ -56,10 +54,11 @@ class PauseScene(Scene):
                                       font=('Helvetica', 20),
                                       parent = self,
                                       position = self.rule_5_position)
-        #create back button
+        #create back button position
         back_button_position = Vector2()
         back_button_position.x = self.size.x / 8
         back_button_position.y = self.size.y / 1.25
+        #create back button
         self.back_button = SpriteNode('./assets/sprites/back_button.png',
                                        parent = self,
                                        position = back_button_position)
@@ -79,7 +78,7 @@ class PauseScene(Scene):
     def touch_ended(self, touch):
         # this method is called, when user releases a finger from the screen
         
-        # if start button is pressed, goto game scene
+        # if back button is pressed, go to close pause scene
         if self.back_button.frame.contains_point(touch.location):
             self.dismiss_modal_scene()
     
