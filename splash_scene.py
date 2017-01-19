@@ -1,8 +1,8 @@
-# Created by: Mr. Coxall
-# Created on: Sep 2016
+# Created by: James
+# Created on: Dec 2016
 # Created for: ICS3U
 # This scene shows a splash screen for 2 seconds,
-#   then transitions to the main menu.
+#   then transitions to the logo scene.
 
 from scene import *
 import ui
@@ -23,6 +23,7 @@ class SplashScene(Scene):
                                      color = (0.61, 0.78, 0.87), 
                                      parent = self, 
                                      size = self.size)
+        #add school crest sprite to middle of scene, use size=self.size to make it full screen
         self.school_crest = SpriteNode('./assets/sprites/MT_Game_Studio.png',
                                        parent = self,
                                        position = self.size/2,
@@ -31,7 +32,7 @@ class SplashScene(Scene):
     def update(self):
         # this method is called, hopefully, 60 times a second
         
-        # after 2 seconds, move to main menu scene
+        # after 2 seconds, move to logi scene
         if not self.presented_scene and time.time() - self.start_time > 2:
             self.present_modal_scene(LogoScene())
     
@@ -61,4 +62,3 @@ class SplashScene(Scene):
         # this method is called, when user place app from background 
         # back into use. Reload anything you might need.
         pass
-    
